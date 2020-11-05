@@ -1,0 +1,7 @@
+* {
+    background-color: aquamarine;
+}
+
+input .signature {
+    visibility: hidden;
+}

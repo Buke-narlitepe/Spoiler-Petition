@@ -1,0 +1,11 @@
+<h2>My Petition</h2>
+<form method="POST" action="signers">
+    {{#if error}}
+            <p>Please sign our petition, then we can understand you are one of us :)</p>
+    {{/if}}
+    <input type="text" name="firstname" />
+    <input type="text" name="lastname" />
+    <input type="text" name="signature" class="signature" style="visibility: hidden;"/>
+    <canvas id="signature-canvas" height="50" width="50"></canvas>
+    <button type="submit">Submit</button>
+</form>
