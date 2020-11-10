@@ -1,0 +1,13 @@
+{
+    "folders": [
+		{
+			"path": "../.."
+		},
+		{
+			"path": "../../../sesam-code"
+		}
+	],
+    "settings": {
+        "liveServer.settings.multiRootWorkspaceName": "sesam-code"
+    }
+}

@@ -1,11 +1,30 @@
-<h2>My Petition</h2>
-<form method="POST" action="signers">
+<div class="navi">
+    <a href="/profile">Hi you!</a>
+    &nbsp; |
+    <a href="/signers">&nbsp;All Members</a>
+    &nbsp; |
+    <a href="/">&nbsp;Sign</a>
+    &nbsp; |
+    <a href="/edit">&nbsp;Edit Profile</a>
+    &nbsp; |
+    <a href="/logout">&nbsp;Logout</a>
+</div>
+<div class="sign">
+<h2>Sign our petition to make intentionally revealing movie and TV series <span>spoilers</span> a criminal offence!</h2>
+<form method="POST" action="/sign-petition">
     {{#if error}}
-            <p>Please sign our petition, then we can understand you are one of us :)</p>
+            <p class="error">Uh oh! Something's missing!</p>
     {{/if}}
-    <input type="text" name="firstname" />
-    <input type="text" name="lastname" />
-    <input type="text" name="signature" class="signature" style="visibility: hidden;"/>
-    <canvas id="signature-canvas" height="50" width="50"></canvas>
+    <img src="spoils.png" class="spoiler">
+    <br>
+    <input type="hidden" name="signature" class="signature"/>
+    <input type="hidden" name="_csrf" value="{{csrfToken}}">
+    <div class="canvas">
+    <label for="sign">Sign here:</label>
+    <canvas id="signature-canvas" width="400" height="70"></canvas>
+    </div>
+    <div class="submit">
     <button type="submit">Submit</button>
+    </div>
 </form>
+</div>
