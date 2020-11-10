@@ -33,7 +33,6 @@ app.use((req, res, next) => {
     next();
 });
 
-// TODO: render signature form
 app.get("/", (req, res) => {
     if (req.session.signed) {
         res.redirect("/thank-you");
@@ -58,7 +57,6 @@ app.post("/register", (req, res) => {
         bcrypt
             .hash(req.body.password, 10)
             .then((hash) => {
-                console.log(hash); // TODO: use that hash to store in the database
                 return db.createUser(
                     req.body.firstname,
                     req.body.lastname,
@@ -69,7 +67,7 @@ app.post("/register", (req, res) => {
             .then((value) => {
                 req.session.user_id = value.rows[0].id;
                 req.session.firstname = value.rows[0].firstname;
-                res.redirect("/");
+                res.redirect("/profile");
             })
             .catch(() => {
                 res.render("register", {
@@ -92,7 +90,6 @@ app.get("/login", (req, res) => {
 });
 
 app.post("/login", (req, res) => {
-    // TODO: read hash from database
     if (req.body.email) {
         db.getUserByEmail(req.body.email).then((value) => {
             bcrypt
@@ -112,16 +109,41 @@ app.post("/login", (req, res) => {
     }
 });
 
-// TODO: render list of all signers
+app.get("/profile", (req, res) => {
+    res.render("profile");
+});
+
+app.post("/profile", (req, res) => {
+    if (req.body.homepage) {
+        if (!req.body.homepage.startsWith("http")) {
+            res.render("profile", { error: true });
+        }
+    }
+    db.createProfile(
+        req.body.age,
+        req.body.city,
+        req.body.homepage,
+        req.session.user_id
+    ).then(() => {
+        res.redirect("/");
+    });
+});
+
 app.get("/signers", (req, res) => {
-    db.getSignatures().then((data) => {
+    db.getSigners().then((data) => {
         res.render("signers", {
             signatures: data.rows,
         });
     });
 });
 
-// TODO: add signature
+app.get("/signers/:city", (req, res) => {
+    const city = req.params.city;
+    db.getSigners(city).then((data) => {
+        res.render("signers", { signatures: data.rows });
+    });
+});
+
 app.post("/sign-petition", (req, res) => {
     if (req.body.signature && req.session.user_id) {
         db.addSignature(req.body.signature, req.session.user_id).then(

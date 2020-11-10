@@ -1,0 +1,20 @@
+<div class="profile">
+<h2>Please tell us a little bit more about yourself</h2>
+<form method="POST" action="/profile">
+    {{#if error}}
+            <p class="error">Your homepage should be start with http!</p>
+    {{/if}}
+    <img src="Spoiler-Alert.png" class="spoiler" >
+    <br>
+    <label for="age">Age:</label>
+    <input type="text" name="firstname"  />
+    <label for="city">City:</label>
+    <input type="text" name="lastname" />
+    <label for="homepage">Homepage:</label>
+    <input type="url" name="url"  />
+    <input type="hidden" name="_csrf" value="{{csrfToken}}">
+    <div class="submit">
+    <button type="submit">Continue</button>
+    </div>
+</form>
+</div>
