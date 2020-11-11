@@ -119,21 +119,97 @@ app.post("/profile", (req, res) => {
             res.render("profile", { error: true });
         }
     }
+    console.log(req.body);
     db.createProfile(
+        req.session.user_id,
         req.body.age,
         req.body.city,
-        req.body.homepage,
-        req.session.user_id
+        req.body.homepage
     ).then(() => {
         res.redirect("/");
     });
 });
+
+app.get("/profile/edit", (req, res) => {
+    db.editProfile(req.session.user_id)
+        .then((data) => {
+            res.render("editprofile", {
+                profile: data.rows[0],
+            });
+        })
+        .catch(() => {
+            res.render("editprofile", {
+                error: true,
+            });
+        });
+    // TODO: 1 SQL QUERY JOIN users with the user_profiles
+    // render new handlebars template, and pass it the data of the query
+    // prefill all input fields in handlebars template with that data by adding the value="" attributes
+    // DONT FORGET TO ADD THE CRSF TOKEN
+});
+
+app.post("/profile/edit", (req, res) => {
+    if (!req.session.user_id) {
+        res.redirect("/login");
+    }
+    if (req.body.pass != "") {
+        bcrypt
+            .hash(req.body.pass)
+            .then((hash) => {
+                return db.updatePassword(req.session.user_id, hash);
+            })
+            .then(() => {
+                res.redirect("/");
+            });
+    }
+
+    db.updateUser(
+        req.session.user_id,
+        req.body.firstname,
+        req.body.lastname,
+        req.body.email
+    ).then(() => {
+        res.redirect("/");
+    });
+
+    db.updateProfile(
+        req.session.user_id,
+        req.body.age,
+        req.body.city,
+        req.body.homepage
+    ).then(() => {
+        res.redirect("/");
+    });
+    // TODO: 1 SQL Query for firstname, lastname, email (users table)
+    // TODO: 2 SQL QUERY for password
+    // - has user provided a new password? (BONUS: check old password first for security reasons // BONUS 2: input for repeat new password)
+    // - IF no: just do nothing
+    // - IF yes: hash it, UPDATE query on users table where you only change the password
+    // TODO: 3 SQL QUERY for user_profile (age, homepage, city)
+    // INSERT if profile for that user doesnt exist already OR UPDATE if profile already exists -> UPSERT
+    // BONUS: Promise.all to run all three queries in parallel
+});
+
+// We want to go with a POST request,
+// since it's a permanent change to the data on our server.
+/*app.post("/signatures/delete", (req, res) => {
+    // TODO: 1 SQL query to delete the row for that user from the signatures table
+    // TODO: with css change styling of form to look like every other link in your petition project
+    
+        <form action="/signature/delete" method="POST">
+            <input type="hidden" name="_csrf" value="{{csrfToken}}">
+            <button>Delete Signature</button>
+        </form>
+    
+});
+*/
 
 app.get("/signers", (req, res) => {
     db.getSigners().then((data) => {
         res.render("signers", {
             signatures: data.rows,
         });
+        console.log(data.rows);
     });
 });
 
@@ -167,7 +243,7 @@ app.get("/thank-you", (req, res) => {
             console.log(data.rows[0]);
 
             res.render("thank", {
-                signature: data.rows[0].signature,
+                signatures: data.rows[0].signature,
             });
         });
     } else {
@@ -180,6 +256,6 @@ app.get("/logout", function (req, res) {
     res.redirect("/login");
 });
 
-app.listen(3000, () => {
+app.listen(process.env.PORT || 3000, () => {
     console.log("PETITION IS LISTENING...");
 });

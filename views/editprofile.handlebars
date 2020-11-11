@@ -1,0 +1,39 @@
+<div class="navi">
+    <a href="/profile">Hi you!</a>
+    &nbsp; |
+    <a href="/signers">&nbsp;All Members</a>
+    &nbsp; |
+    <a href="/">&nbsp;Sign</a>
+    &nbsp; |
+    <a href="/profile/edit">&nbsp;Edit Profile</a>
+    &nbsp; |
+    <a href="/logout">&nbsp;Logout</a>
+</div>
+<div class="editprofile">
+<h2>If you want to update something:</h2>
+<form method="POST" action="/profile/edit">
+    {{#if error}}
+            <p class="error">Something's missing!</p>
+    {{/if}}
+    <img src="Spoiler-Alert.png" class="spoiler" >
+    <br>
+    <label for="firstname">First Name:</label>
+    <input type="text" name="firstname" value={{#profile}}{{firstname}}{{/profile}}  />
+    <label for="lastname">Last Name:</label>
+    <input type="text" name="lastname" value={{#profile}}{{lastname}}{{/profile}} />
+    <label for="email">Email:</label>
+    <input type="email" name="email" value={{#profile}}{{email}}{{/profile}} />
+    <label for="password">Password:</label>
+    <input type="password" name="password" value={{#profile}}{{password}}{{/profile}} />
+    <label for="age">Age:</label>
+    <input type="text" name="age" value={{#profile}}{{age}}{{/profile}} />
+    <label for="city">City:</label>
+    <input type="text" name="city" value={{#profile}}{{city}}{{/profile}}/>
+    <label for="homepage">Homepage:</label>
+    <input type="url" name="homepage" value={{#profile}}{{homepage}}{{/profile}} />
+    <input type="hidden" name="_csrf" value="{{csrfToken}}">
+    <div class="submit">
+    <button type="submit">Update</button>
+    </div>
+</form>
+</div>
