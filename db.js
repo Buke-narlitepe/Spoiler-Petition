@@ -34,7 +34,7 @@ module.exports.addSignature = function addSignature(signature, user_id) {
 };
 
 module.exports.getSignatureById = function getSignatureById(id) {
-    return db.query("SELECT * FROM signatures WHERE id = $1", [id]);
+    return db.query("SELECT * FROM signatures WHERE user_id = $1", [id]);
 };
 
 module.exports.createUser = function createUser(
@@ -95,14 +95,25 @@ module.exports.updateProfile = function updateProfile(
     );
 };
 
-module.exports.updateUser = function updateUser(firstname, lastname, email) {
-    return db.query(`UPDATE users SET firstname=$1,lastname=$2,email=$3`, [
-        firstname,
-        lastname,
-        email,
+module.exports.updateUser = function updateUser(
+    user_id,
+    firstname,
+    lastname,
+    email
+) {
+    return db.query(
+        `UPDATE users SET firstname=$2,lastname=$3,email=$4 WHERE id=$1`,
+        [user_id, firstname, lastname, email]
+    );
+};
+
+module.exports.updatePassword = function updatePassword(user_id, password) {
+    return db.query(`UPDATE users SET password = $2 WHERE id=$1`, [
+        user_id,
+        password,
     ]);
 };
 
-module.exports.updatePassword = function updatePassword(password) {
-    return db.query(`UPDATE users SET password = $1`, [password]);
+module.exports.deleteSignatures = function deleteSignatures(id) {
+    return db.query(`DELETE FROM signatures WHERE user_id = $1`, [id]);
 };

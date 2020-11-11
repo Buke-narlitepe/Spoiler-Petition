@@ -12,7 +12,11 @@
 <h2>YOU ARE IN! </h2>
 <p>YOUR SIGNATURE:</p>
 <br>
-<img src ={{signature}} class="signature">
+<img src="{{signature}}" class="signature">
 <br>
 <a href="/signers" target="_blank">If you want to see the rest of us please click</a>
 
+<form method="POST" action="/signature/delete">
+    <input type="hidden" name="_csrf" value="{{csrfToken}}"></input>
+    <button>Delete your signature</button>
+</form>

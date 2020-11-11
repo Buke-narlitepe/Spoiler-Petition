@@ -34,13 +34,17 @@ app.use((req, res, next) => {
 });
 
 app.get("/", (req, res) => {
-    if (req.session.signed) {
-        res.redirect("/thank-you");
-    } else if (!req.session.user_id) {
-        res.redirect("/register");
-    } else {
-        res.render("home");
+    if (!req.session.user_id) {
+        return res.redirect("/login");
     }
+    db.getSignatureById(req.session.user_id).then((data) => {
+        console.log(data.rows[0]);
+        if (data.rows.length === 0) {
+            res.render("home");
+        } else {
+            res.redirect("/thank-you");
+        }
+    });
 });
 
 app.get("/register", (req, res) => {
@@ -92,6 +96,9 @@ app.get("/login", (req, res) => {
 app.post("/login", (req, res) => {
     if (req.body.email) {
         db.getUserByEmail(req.body.email).then((value) => {
+            if (value.rows.length === 0) {
+                return res.render("login", { error: true });
+            }
             bcrypt
                 .compare(req.body.password, value.rows[0].password)
                 .then((match) => {
@@ -100,7 +107,7 @@ app.post("/login", (req, res) => {
                         req.session.firstname = value.rows[0].firstname;
                         res.redirect("/");
                     } else {
-                        res.render("/login", {
+                        res.render("login", {
                             error: true,
                         });
                     }
@@ -110,10 +117,16 @@ app.post("/login", (req, res) => {
 });
 
 app.get("/profile", (req, res) => {
+    if (!req.session.user_id) {
+        return res.redirect("/login");
+    }
     res.render("profile");
 });
 
 app.post("/profile", (req, res) => {
+    if (!req.session.user_id) {
+        return res.redirect("/login");
+    }
     if (req.body.homepage) {
         if (!req.body.homepage.startsWith("http")) {
             res.render("profile", { error: true });
@@ -131,6 +144,9 @@ app.post("/profile", (req, res) => {
 });
 
 app.get("/profile/edit", (req, res) => {
+    if (!req.session.user_id) {
+        return res.redirect("/login");
+    }
     db.editProfile(req.session.user_id)
         .then((data) => {
             res.render("editprofile", {
@@ -150,23 +166,37 @@ app.get("/profile/edit", (req, res) => {
 
 app.post("/profile/edit", (req, res) => {
     if (!req.session.user_id) {
-        res.redirect("/login");
+        return res.redirect("/login");
     }
-    let promises;
+    let promises = [];
+
     if (req.body.password) {
-        promises = [
+        promises.push(
             bcrypt.hash(req.body.password, 10).then((hash) => {
-                return db.updatePassword(hash);
-            }),
-        ];
+                return db.updatePassword(req.session.user_id, hash);
+            })
+        );
     }
-    promises = [
-        db.updateUser(req.body.firstname, req.body.lastname, req.body.email),
-        db.updateProfile(req.body.age, req.body.city, req.body.homepage),
-    ];
+    promises.push(
+        db.updateUser(
+            req.session.user_id,
+            req.body.firstname,
+            req.body.lastname,
+            req.body.email
+        )
+    );
+
+    promises.push(
+        db.updateProfile(
+            req.session.user_id,
+            req.body.age,
+            req.body.city,
+            req.body.homepage
+        )
+    );
     Promise.all(promises)
         .then(() => {
-            res.redirect("/petition");
+            res.redirect("/");
         })
         .catch(function (error) {
             console.log("error:", error);
@@ -194,8 +224,21 @@ app.post("/profile/edit", (req, res) => {
     
 });
 */
+app.post("/signature/delete", (req, res) => {
+    db.deleteSignatures(req.session.user_id)
+        .then(function () {
+            req.session.user_id = null; //req.session.signaturesId = null;
+            res.redirect("/");
+        })
+        .catch(function (error) {
+            console.log("error deleting signature:", error);
+        });
+});
 
 app.get("/signers", (req, res) => {
+    if (!req.session.user_id) {
+        return res.redirect("/login");
+    }
     db.getSigners().then((data) => {
         res.render("signers", {
             signatures: data.rows,
@@ -205,6 +248,9 @@ app.get("/signers", (req, res) => {
 });
 
 app.get("/signers/:city", (req, res) => {
+    if (!req.session.user_id) {
+        return res.redirect("/login");
+    }
     const city = req.params.city;
     db.getSigners(city).then((data) => {
         res.render("signers", { signatures: data.rows });
@@ -212,14 +258,13 @@ app.get("/signers/:city", (req, res) => {
 });
 
 app.post("/sign-petition", (req, res) => {
-    if (req.body.signature && req.session.user_id) {
-        db.addSignature(req.body.signature, req.session.user_id).then(
-            (value) => {
-                req.session.user_id = value.rows[0].id;
-                req.session.signed = true;
-                res.redirect("/thank-you");
-            }
-        );
+    if (!req.session.user_id) {
+        return res.redirect("/login");
+    }
+    if (req.body.signature) {
+        db.addSignature(req.body.signature, req.session.user_id).then(() => {
+            res.redirect("/thank-you");
+        });
     } else {
         res.render("home", {
             error: true,
@@ -227,19 +272,19 @@ app.post("/sign-petition", (req, res) => {
     }
 });
 app.get("/thank-you", (req, res) => {
-    if (req.session.signed) {
-        console.log(req.session.user_id);
-
-        db.getSignatureById(req.session.user_id).then((data) => {
-            console.log(data.rows[0]);
-
-            res.render("thank", {
-                signatures: data.rows[0].signature,
-            });
-        });
-    } else {
-        res.redirect("/");
+    if (!req.session.user_id) {
+        return res.redirect("/login");
     }
+    db.getSignatureById(req.session.user_id).then((data) => {
+        console.log(data.rows[0]);
+        if (data.rows.length === 0) {
+            res.redirect("/");
+        } else {
+            res.render("thank", {
+                signature: data.rows[0].signature,
+            });
+        }
+    });
 });
 
 app.get("/logout", function (req, res) {
