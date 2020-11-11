@@ -95,29 +95,14 @@ module.exports.updateProfile = function updateProfile(
     );
 };
 
-module.exports.updateUser = function updateUser(
-    user_id,
-    firstname,
-    lastname,
-    email
-) {
-    return db.query(
-        `INSERT INTO users (user_id, firstname, lastname, email)
-    VALUES ($1, $2, $3, $4)
-    ON CONFLICT (user_id)
-    DO UPDATE SET firstname = $2, city = $3, homepage = $4
-    RETURNING id`,
-        [user_id, firstname, lastname, email]
-    );
+module.exports.updateUser = function updateUser(firstname, lastname, email) {
+    return db.query(`UPDATE users SET firstname=$1,lastname=$2,email=$3`, [
+        firstname,
+        lastname,
+        email,
+    ]);
 };
 
-module.exports.updatePassword = function updatePassword(user_id, password) {
-    return db.query(
-        `INSERT INTO users (user_id, password)
-    VALUES ($1, $2)
-    ON CONFLICT (user_id)
-    DO UPDATE SET password = $2
-    RETURNING id`,
-        [user_id, password]
-    );
+module.exports.updatePassword = function updatePassword(password) {
+    return db.query(`UPDATE users SET password = $1`, [password]);
 };

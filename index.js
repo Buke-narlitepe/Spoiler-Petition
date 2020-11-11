@@ -152,43 +152,34 @@ app.post("/profile/edit", (req, res) => {
     if (!req.session.user_id) {
         res.redirect("/login");
     }
-    if (req.body.pass != "") {
-        bcrypt
-            .hash(req.body.pass)
-            .then((hash) => {
-                return db.updatePassword(req.session.user_id, hash);
-            })
-            .then(() => {
-                res.redirect("/");
-            });
+    let promises;
+    if (req.body.password) {
+        promises = [
+            bcrypt.hash(req.body.password, 10).then((hash) => {
+                return db.updatePassword(hash);
+            }),
+        ];
     }
-
-    db.updateUser(
-        req.session.user_id,
-        req.body.firstname,
-        req.body.lastname,
-        req.body.email
-    ).then(() => {
-        res.redirect("/");
-    });
-
-    db.updateProfile(
-        req.session.user_id,
-        req.body.age,
-        req.body.city,
-        req.body.homepage
-    ).then(() => {
-        res.redirect("/");
-    });
-    // TODO: 1 SQL Query for firstname, lastname, email (users table)
-    // TODO: 2 SQL QUERY for password
-    // - has user provided a new password? (BONUS: check old password first for security reasons // BONUS 2: input for repeat new password)
-    // - IF no: just do nothing
-    // - IF yes: hash it, UPDATE query on users table where you only change the password
-    // TODO: 3 SQL QUERY for user_profile (age, homepage, city)
-    // INSERT if profile for that user doesnt exist already OR UPDATE if profile already exists -> UPSERT
-    // BONUS: Promise.all to run all three queries in parallel
+    promises = [
+        db.updateUser(req.body.firstname, req.body.lastname, req.body.email),
+        db.updateProfile(req.body.age, req.body.city, req.body.homepage),
+    ];
+    Promise.all(promises)
+        .then(() => {
+            res.redirect("/petition");
+        })
+        .catch(function (error) {
+            console.log("error:", error);
+        });
 });
+// TODO: 1 SQL Query for firstname, lastname, email (users table)
+// TODO: 2 SQL QUERY for password
+// - has user provided a new password? (BONUS: check old password first for security reasons // BONUS 2: input for repeat new password)
+// - IF no: just do nothing
+// - IF yes: hash it, UPDATE query on users table where you only change the password
+// TODO: 3 SQL QUERY for user_profile (age, homepage, city)
+// INSERT if profile for that user doesnt exist already OR UPDATE if profile already exists -> UPSERT
+// BONUS: Promise.all to run all three queries in parallel
 
 // We want to go with a POST request,
 // since it's a permanent change to the data on our server.
@@ -252,7 +243,7 @@ app.get("/thank-you", (req, res) => {
 });
 
 app.get("/logout", function (req, res) {
-    req.session.user_id = null;
+    req.session = null;
     res.redirect("/login");
 });
 
