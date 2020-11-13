@@ -64,17 +64,16 @@ module.exports.createProfile = function createProfile(
         `INSERT INTO user_profiles (user_id, age, city, homepage)
         VALUES ($1, $2, $3, $4)
         RETURNING *`,
-        [user_id, age, city, homepage]
+        [user_id, age === "" ? null : age, city, homepage]
     );
 };
 
 module.exports.editProfile = function editProfile(input) {
     return db.query(
-        `SELECT users.firstname AS firstname, users.lastname AS lastname, users.email AS email, users.password AS password, user_profiles.age AS age, user_profiles.city AS city, user_profiles.homepage AS homepage
-        FROM users
+        `SELECT * FROM users
         LEFT JOIN user_profiles
         ON user_profiles.user_id = users.id
-        WHERE user_id = $1`,
+        WHERE users.id = $1`,
         [input]
     );
 };
@@ -91,7 +90,7 @@ module.exports.updateProfile = function updateProfile(
     ON CONFLICT (user_id)
     DO UPDATE SET age = $2, city = $3, homepage = $4
     RETURNING id`,
-        [user_id, age, city, homepage]
+        [user_id, age === "" ? null : age, city, homepage]
     );
 };
 
@@ -116,4 +115,8 @@ module.exports.updatePassword = function updatePassword(user_id, password) {
 
 module.exports.deleteSignatures = function deleteSignatures(id) {
     return db.query(`DELETE FROM signatures WHERE user_id = $1`, [id]);
+};
+
+module.exports.countSigners = function countSigners() {
+    return db.query(`SELECT COUNT(signature) FROM signatures`);
 };

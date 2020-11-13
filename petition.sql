@@ -8,7 +8,7 @@ DROP TABLE IF EXISTS user_profiles;
 DROP TABLE IF EXISTS users;
 
 CREATE TABLE users (
-    id SERIAL PRIMARY KEY,
+    id SERIAL PRIMARY KEY,psql
     firstname VARCHAR(100) NOT NULL,
     lastname VARCHAR(100) NOT NULL,
     email VARCHAR(100) NOT NULL UNIQUE,

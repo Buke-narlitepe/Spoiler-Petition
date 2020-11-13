@@ -1,5 +1,5 @@
 <div class="navi">
-    <a href="/profile">Hi you!</a>
+    <a href="/profile/edit">Hi {{session.firstname}} !</a>
     &nbsp; |
     <a href="/signers">&nbsp;All Members</a>
     &nbsp; |
@@ -11,26 +11,27 @@
 </div>
 <div class="editprofile">
 <h2>If you want to update something:</h2>
+    <img src="/neww.png">
+
 <form method="POST" action="/profile/edit">
     {{#if error}}
             <p class="error">Something's missing!</p>
     {{/if}}
-    <img src="Spoiler-Alert.png" class="spoiler" >
     <br>
     <label for="firstname">First Name:</label>
-    <input type="text" name="firstname" value={{#profile}}{{firstname}}{{/profile}}  />
+    <input type="text" name="firstname" value= "{{profile.firstname}}" />
     <label for="lastname">Last Name:</label>
-    <input type="text" name="lastname" value={{#profile}}{{lastname}}{{/profile}} />
+    <input type="text" name="lastname" value="{{profile.lastname}}" />
     <label for="email">Email:</label>
-    <input type="email" name="email" value={{#profile}}{{email}}{{/profile}} />
+    <input type="email" name="email" value= "{{profile.email}}" />
     <label for="password">Password:</label>
-    <input type="password" name="password" value={{#profile}}{{password}}{{/profile}} />
+    <input type="password" name="password" value="{{profile.password}}" />
     <label for="age">Age:</label>
-    <input type="text" name="age" value={{#profile}}{{age}}{{/profile}} />
+    <input type="text" name="age" value="{{profile.age}}" />
     <label for="city">City:</label>
-    <input type="text" name="city" value={{#profile}}{{city}}{{/profile}}/>
+    <input type="text" name="city" value="{{profile.city}}"/>
     <label for="homepage">Homepage:</label>
-    <input type="url" name="homepage" value={{#profile}}{{homepage}}{{/profile}} />
+    <input type="url" name="homepage" value="{{profile.homepage}}" />
     <input type="hidden" name="_csrf" value="{{csrfToken}}">
     <div class="submit">
     <button type="submit">Update</button>

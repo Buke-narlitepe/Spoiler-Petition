@@ -1,7 +1,7 @@
 <div class="navi">
-    <a href="/profile">Hi you!</a>
+    <a href="/profile/edit">Hi {{session.firstname}} !</a>
     &nbsp; |
-    <a href="/signers">&nbsp;All Members</a>
+    <a href="/signers">&nbsp; {{signers}} Members</a>
     &nbsp; |
     <a href="/">&nbsp;Sign</a>
     &nbsp; |
@@ -15,7 +15,7 @@
     {{#if error}}
             <p class="error">Uh oh! Something's missing!</p>
     {{/if}}
-    <img src="spoils.png" class="spoiler">
+    <img src="/spoils.png" class="spoiler">
     <br>
     <input type="hidden" name="signature" class="signature"/>
     <input type="hidden" name="_csrf" value="{{csrfToken}}">

@@ -43,6 +43,22 @@ div.register {
     color: black;
     text-align: left;
 }
+
+div.editprofile {
+    margin-right: 100px;
+    margin-left: 100px;
+    margin-top: 10px;
+    color: black;
+    text-align: left;
+}
+
+div.thank {
+    margin-right: 100px;
+    margin-left: 100px;
+    margin-top: 10px;
+    color: black;
+    text-align: left;
+}
 canvas {
     border: 2px outset rgb(219, 18, 35);
     border-radius: 15px;
@@ -64,7 +80,8 @@ img.signature {
 
 input[type="text"],
 input[type="password"],
-input[type="email"] {
+input[type="email"],
+input[type="url"] {
     border: 0;
     border-bottom: 1px outset rgb(219, 18, 35);
     outline: 0;

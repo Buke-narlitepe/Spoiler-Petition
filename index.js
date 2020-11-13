@@ -24,6 +24,7 @@ app.use(csurf());
 // must come after the csurf middleware
 app.use(function (req, res, next) {
     res.locals.csrfToken = req.csrfToken();
+    res.locals.session = req.session;
     next();
 });
 
@@ -34,17 +35,15 @@ app.use((req, res, next) => {
 });
 
 app.get("/", (req, res) => {
-    if (!req.session.user_id) {
-        return res.redirect("/login");
-    }
-    db.getSignatureById(req.session.user_id).then((data) => {
-        console.log(data.rows[0]);
-        if (data.rows.length === 0) {
-            res.render("home");
-        } else {
-            res.redirect("/thank-you");
-        }
-    });
+    if (!req.session.user_id) return res.redirect("/login");
+    Promise.all([db.countSigners(), db.getSignatureById(req.session.user_id)])
+        .then((data) => {
+            if (data[1].rows.length === 1) return res.redirect("/thank-you");
+            res.render("home", {
+                signers: data[0].rows[0].count,
+            });
+        })
+        .catch((err) => console.log("Error in /thanks: ", err));
 });
 
 app.get("/register", (req, res) => {
@@ -132,9 +131,9 @@ app.post("/profile", (req, res) => {
             res.render("profile", { error: true });
         }
     }
-    console.log(req.body);
+    console.log(req.body, "post-profile");
     db.createProfile(
-        req.session.user_id,
+        req.session.userId,
         req.body.age,
         req.body.city,
         req.body.homepage
@@ -149,6 +148,8 @@ app.get("/profile/edit", (req, res) => {
     }
     db.editProfile(req.session.user_id)
         .then((data) => {
+            console.log(data.rows[0]);
+            console.log(req.session.user_id);
             res.render("editprofile", {
                 profile: data.rows[0],
             });
@@ -158,10 +159,6 @@ app.get("/profile/edit", (req, res) => {
                 error: true,
             });
         });
-    // TODO: 1 SQL QUERY JOIN users with the user_profiles
-    // render new handlebars template, and pass it the data of the query
-    // prefill all input fields in handlebars template with that data by adding the value="" attributes
-    // DONT FORGET TO ADD THE CRSF TOKEN
 });
 
 app.post("/profile/edit", (req, res) => {
@@ -202,32 +199,14 @@ app.post("/profile/edit", (req, res) => {
             console.log("error:", error);
         });
 });
-// TODO: 1 SQL Query for firstname, lastname, email (users table)
-// TODO: 2 SQL QUERY for password
-// - has user provided a new password? (BONUS: check old password first for security reasons // BONUS 2: input for repeat new password)
-// - IF no: just do nothing
-// - IF yes: hash it, UPDATE query on users table where you only change the password
-// TODO: 3 SQL QUERY for user_profile (age, homepage, city)
-// INSERT if profile for that user doesnt exist already OR UPDATE if profile already exists -> UPSERT
-// BONUS: Promise.all to run all three queries in parallel
 
-// We want to go with a POST request,
-// since it's a permanent change to the data on our server.
-/*app.post("/signatures/delete", (req, res) => {
-    // TODO: 1 SQL query to delete the row for that user from the signatures table
-    // TODO: with css change styling of form to look like every other link in your petition project
-    
-        <form action="/signature/delete" method="POST">
-            <input type="hidden" name="_csrf" value="{{csrfToken}}">
-            <button>Delete Signature</button>
-        </form>
-    
-});
-*/
 app.post("/signature/delete", (req, res) => {
+    if (!req.session.user_id) {
+        return res.redirect("/login");
+    }
     db.deleteSignatures(req.session.user_id)
         .then(function () {
-            req.session.user_id = null; //req.session.signaturesId = null;
+            req.session.signed = null;
             res.redirect("/");
         })
         .catch(function (error) {
@@ -243,7 +222,7 @@ app.get("/signers", (req, res) => {
         res.render("signers", {
             signatures: data.rows,
         });
-        console.log(data.rows);
+        console.log(data.rows, "get-signers");
     });
 });
 
@@ -263,6 +242,7 @@ app.post("/sign-petition", (req, res) => {
     }
     if (req.body.signature) {
         db.addSignature(req.body.signature, req.session.user_id).then(() => {
+            req.session.signed = "true";
             res.redirect("/thank-you");
         });
     } else {
@@ -272,19 +252,18 @@ app.post("/sign-petition", (req, res) => {
     }
 });
 app.get("/thank-you", (req, res) => {
-    if (!req.session.user_id) {
-        return res.redirect("/login");
-    }
-    db.getSignatureById(req.session.user_id).then((data) => {
-        console.log(data.rows[0]);
-        if (data.rows.length === 0) {
-            res.redirect("/");
-        } else {
+    if (!req.session.user_id) return res.redirect("/login");
+    Promise.all([db.countSigners(), db.getSignatureById(req.session.user_id)])
+        .then((data) => {
+            console.log(data);
+            if (data[1].rows.length === 0) return res.redirect("/");
+
             res.render("thank", {
-                signature: data.rows[0].signature,
+                signature: data[1].rows[0].signature,
+                signers: data[0].rows[0].count,
             });
-        }
-    });
+        })
+        .catch((err) => console.log("Error in /thanks: ", err));
 });
 
 app.get("/logout", function (req, res) {
@@ -295,3 +274,5 @@ app.get("/logout", function (req, res) {
 app.listen(process.env.PORT || 3000, () => {
     console.log("PETITION IS LISTENING...");
 });
+
+module.exports = app;
