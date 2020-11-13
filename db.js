@@ -2,7 +2,7 @@ const spicedPg = require("spiced-pg");
 
 // TODO: change connection string, to connect to petition db
 const db = spicedPg(
-    process.env.DATABASEURL || "postgres:buke:buke@localhost:5432/petition"
+    process.env.DATABASE_URL || "postgres:buke:buke@localhost:5432/petition"
 );
 
 //signatures,users and user_profiles table with JOIN and get signers with city variable
