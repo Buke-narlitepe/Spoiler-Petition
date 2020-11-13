@@ -1,6 +1,36 @@
-<h2>MEMBERS OF THE GANG</h2>
-<ul>
+<div class="navi">
+    <a href="/profile">Hi {{session.firstname}}!</a>
+    &nbsp; |
+    <a href="/signers">&nbsp;{{signers}} Members</a>
+    &nbsp; |
+    <a href="/">&nbsp;Your Signature</a>
+    &nbsp; |
+    <a href="/profile/edit">&nbsp;Edit Profile</a>
+    &nbsp; |
+    <a href="/logout">&nbsp;Logout</a>
+</div>
+<div class="list">
+   <h2 class="list">MEMBERS OF THE GANG</h2>
+<ul style="list-style-type:none;" class="list">
     {{#each signatures}}
-    <li><a href="{{homepage}}">{{firstname}} {{lastname}}</a> {{age}} <a href="/signers/{{city}}">{{city}}</a></li>
+    <li><span class="party">🥳</span><a href="{{homepage}}">{{firstname}} {{lastname}}</a> {{age}} <a href="/signers/{{city}}">{{city}}</a></li>
     {{/each}}
-</ul>
+</ul> 
+<button class="elevator">Back to Top</button>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/elevator.js"></script>
+<script>
+// Elevator script included on the page, already.
+ 
+window.onload = function() {
+  var elevator = new Elevator({
+    element: document.querySelector('.elevator'),
+    mainAudio: '/Elevator-music.mp3',
+    endAudio: '/ding.mp3'
+  });
+}
+</script> 
+
+
+
+

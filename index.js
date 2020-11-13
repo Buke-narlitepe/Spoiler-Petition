@@ -133,13 +133,21 @@ app.post("/profile", (req, res) => {
     }
     console.log(req.body, "post-profile");
     db.createProfile(
-        req.session.userId,
+        req.session.user_id,
         req.body.age,
         req.body.city,
         req.body.homepage
     ).then(() => {
         res.redirect("/");
     });
+});
+
+app.get("/spoiler", (req, res) => {
+    return res.render("spoiler");
+});
+
+app.get("/sure", (req, res) => {
+    return res.render("sure");
 });
 
 app.get("/profile/edit", (req, res) => {
