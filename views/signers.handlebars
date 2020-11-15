@@ -1,16 +1,12 @@
 <div class="navi">
     <a href="/profile">Hi {{session.firstname}}!</a>
-    &nbsp; |
     <a href="/signers">&nbsp;{{signers}} Members</a>
-    &nbsp; |
     <a href="/">&nbsp;Your Signature</a>
-    &nbsp; |
     <a href="/profile/edit">&nbsp;Edit Profile</a>
-    &nbsp; |
     <a href="/logout">&nbsp;Logout</a>
 </div>
 <div class="list">
-   <h2 class="list">MEMBERS OF THE GANG</h2>
+   <h2 class="list">SIGNERS WHO BELIEVE IN THIS PETITION</h2>
 <ul style="list-style-type:none;" class="list">
     {{#each signatures}}
     <li><span class="party">🥳</span><a href="{{homepage}}">{{firstname}} {{lastname}}</a> {{age}} <a href="/signers/{{city}}">{{city}}</a></li>

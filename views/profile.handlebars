@@ -1,21 +1,17 @@
 <div class="navi">
     <a href="/profile">Hi {{session.firstname}} !</a>
-    &nbsp; |
     <a href="/signers">&nbsp;All Members</a>
-    &nbsp; |
     <a href="/">&nbsp;Sign</a>
-    &nbsp; |
     <a href="/profile/edit">&nbsp;Edit Profile</a>
-    &nbsp; |
     <a href="/logout">&nbsp;Logout</a>
 </div>
 <div class="profile">
-<h2>Please tell us a little bit more about yourself</h2>
+<h2>Please tell us a little bit more about yourself(This is totally optional)</h2>
 <form method="POST" action="/profile">
     {{#if error}}
             <p class="error">Your homepage should be start with http!</p>
     {{/if}}
-    <img src="Spoiler-Alert.png" class="spoiler" >
+    <img src="/tellmore.gif" class="spoiler">
     <br>
     <label for="age">Age:</label>
     <input type="text" name="age"  />

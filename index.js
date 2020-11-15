@@ -199,6 +199,7 @@ app.post("/profile/edit", (req, res) => {
             req.body.homepage
         )
     );
+
     Promise.all(promises)
         .then(() => {
             res.redirect("/");
@@ -226,12 +227,14 @@ app.get("/signers", (req, res) => {
     if (!req.session.user_id) {
         return res.redirect("/login");
     }
-    db.getSigners().then((data) => {
-        res.render("signers", {
-            signatures: data.rows,
-        });
-        console.log(data.rows, "get-signers");
-    });
+    Promise.all([db.countSigners(), db.getSigners()])
+        .then((data) => {
+            res.render("signers", {
+                signatures: data[1].rows,
+                signers: data[0].rows[0].count,
+            });
+        })
+        .catch((err) => console.log("Error in /thanks: ", err));
 });
 
 app.get("/signers/:city", (req, res) => {

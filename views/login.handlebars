@@ -1,21 +1,12 @@
 <div class="navi">
     <a href="/login">Login</a>
-    &nbsp; |
     <a href="/register">&nbsp;Register</a>
-    &nbsp; |
-    <a href="/signers">&nbsp;All Members</a>
-    &nbsp; |
-    <a href="/">&nbsp;Sign</a>
-    &nbsp; |
-    <a href="/profile/edit">&nbsp;Edit Profile</a>
-    &nbsp; |
-    <a href="/logout">&nbsp;Logout</a>
 </div>
 <div class="login">
-<h2>Please login to our petition:</h2>
+<h2>Please log in to your account:</h2>
 <form method="POST" action="/login">
     {{#if error}}
-            <p class="error">Uh oh! Something's missing!</p>
+            <p class="error">Uh oh! Your email address or password does not match! Please try again...</p>
     {{/if}}
     <iframe src="https://giphy.com/embed/XdUFOwOUPgYDTiuGYE" width="480" height="271" frameBorder="0" class="giphy-embed" allowFullScreen></iframe><p><a href="https://giphy.com/gifs/cbs-instinct-cbs-instinctcbs-XdUFOwOUPgYDTiuGYE"></a></p>
     <br>
