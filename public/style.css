@@ -6,9 +6,8 @@
     margin-top: 10px;
     background: url(background.jpg) no-repeat center center fixed;
     background-size: cover;
-    /* background-color: rgb(250, 233, 0); */
     font-family: "Bangers", cursive;
-    font-weight: lighter;
+    font-weight: 500;
     color: black;
     font-size: 30px;
 }
@@ -56,7 +55,7 @@ div.register {
     margin-right: 100px;
     margin-left: 100px;
     margin-top: 10px;
-    color: black;
+    color: rgb(36, 33, 33);
     text-align: left;
 }
 
@@ -72,8 +71,11 @@ div.thank {
     margin-right: 100px;
     margin-left: 100px;
     margin-top: 10px;
-    color: black;
     text-align: left;
+}
+label {
+    color: rgb(36, 33, 33);
+    font-weight: 100;
 }
 
 div.list {
@@ -95,9 +97,11 @@ button.elevator {
 }
 
 ul.list,
-li,
-h2.list {
+li {
     background: transparent;
+    font-size: 30px;
+    font-weight: 300px;
+    color: rgb(36, 33, 33);
 }
 h2.list {
     text-align: center;
@@ -190,6 +194,11 @@ input[type="url"] {
     margin-bottom: 20px;
     padding-top: 20px;
     background: transparent;
+    color: black;
+}
+div.thank p,
+a {
+    color: rgb(36, 33, 33);
 }
 
 p {

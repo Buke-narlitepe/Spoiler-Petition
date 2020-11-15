@@ -131,7 +131,6 @@ app.post("/profile", (req, res) => {
             res.render("profile", { error: true });
         }
     }
-    console.log(req.body, "post-profile");
     db.createProfile(
         req.session.user_id,
         req.body.age,
